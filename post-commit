@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# An example hook script to prepare a packed repository for use over
+# dumb transports.
+#
+# To enable this hook, rename this file to "post-update".
+
+curl -X POST "http://localhost:8090/git/notifyCommit?url=file://C:\SCM\GitJenkins"
