@@ -19,35 +19,6 @@ SET user=
 SET password=
 SET collabclient = ccollab
 
-:set_default 
-SET melJenkins = C:\GitJenkins
-SET sourcePath = %melJenkins%Temp
-SET outputPath = C:\SCM\GitJenkins
-SET user = melgage
-SET password = melgage
-SET host = http://127.0.0.1:8080
-SET collabclient = "c:\Program Files\Collaborator Client 12201\ccollab.exe"
-echo The value of sourcePath is %sourcePath% 
-echo The value of outputPath is %outputPath% 
-EXIT /B 0
-
-:set_env
-SET sourcePath = %~dp0
-SET outputPath = %4%
-SET user = %2%
-SET password = %4%
-SET host = %1%
-echo The value of sourcePath is %sourcePath% 
-echo The value of outputPath is %outputPath% 
-EXIT /B 0
-
-:cleanup
-REM Clean up temporary files
-del /f /q /s %sourcePath%\*.* > NUL
-rmdir /q /s %sourcePath%
-rmdir /q /s C:\GitJenkins
-EXIT /B 0
-
 
 if [%1%]==[] ( call :set_default ) ELSE (call :set_env )
 echo "Running" >> JenkinsTest.log
@@ -86,3 +57,33 @@ if [%1%]==[] ( call :cleanup )
 
 REM pause
 REM cmd /K
+EXIT /B 0
+
+:set_default
+SET melJenkins = C:\GitJenkins
+SET sourcePath = %melJenkins%Temp
+SET outputPath = C:\SCM\GitJenkins
+SET user = melgage
+SET password = melgage
+SET host = http://127.0.0.1:8080
+SET collabclient = "c:\Program Files\Collaborator Client 12201\ccollab.exe"
+echo The value of sourcePath is %sourcePath%
+echo The value of outputPath is %outputPath%
+EXIT /B 0
+
+:set_env
+SET sourcePath = %~dp0
+SET outputPath = %4%
+SET user = %2%
+SET password = %4%
+SET host = %1%
+echo The value of sourcePath is %sourcePath% 
+echo The value of outputPath is %outputPath% 
+EXIT /B 0
+
+:cleanup
+REM Clean up temporary files
+del /f /q /s %sourcePath%\*.* > NUL
+rmdir /q /s %sourcePath%
+rmdir /q /s C:\GitJenkins
+EXIT /B 0
