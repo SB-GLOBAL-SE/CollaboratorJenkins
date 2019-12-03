@@ -20,7 +20,7 @@ SET password=
 SET collabclient = ccollab
 
 
-if [%1%]==[] ( call :set_default ) ELSE (call :set_env )
+if [%1%]==[] ( call :set_default ) ELSE ( call :set_env )
 echo "Running" >> JenkinsTest.log
 date /T >> JenkinsTest.log
 time /T >> JenkinsTest.log
