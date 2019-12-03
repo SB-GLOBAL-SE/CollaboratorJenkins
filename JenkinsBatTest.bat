@@ -7,42 +7,82 @@ REM echo "**********************************************************************
 
 REM echo "Task 2"
 REM ipconfig
+REM echo "JenkinsBatTest.bat <CollabHost> <user> <password> <outPutPath> "
 
+
+SET sourcePath=
+SET outputPath=
+SET melJenkins=
+SET pmdBin=C:\PMD\bin
+SET host=
+SET user=
+SET password=
+SET collabclient = ccollab
+
+:set_default 
+SET melJenkins = C:\GitJenkins
+SET sourcePath = %melJenkins%Temp
+SET outputPath = C:\SCM\GitJenkins
+SET user = melgage
+SET password = melgage
+SET host = http://127.0.0.1:8080
+SET collabclient = "c:\Program Files\Collaborator Client 12201\ccollab.exe"
+echo The value of sourcePath is %sourcePath% 
+echo The value of outputPath is %outputPath% 
+EXIT /B 0
+
+:set_env
+SET sourcePath = %~dp0
+SET outputPath = %4%
+SET user = %2%
+SET password = %4%
+SET host = %1%
+echo The value of sourcePath is %sourcePath% 
+echo The value of outputPath is %outputPath% 
+EXIT /B 0
+
+:cleanup
+REM Clean up temporary files
+del /f /q /s %sourcePath%\*.* > NUL
+rmdir /q /s %sourcePath%
+rmdir /q /s C:\GitJenkins
+EXIT /B 0
+
+
+if [%1%]==[] ( call :set_default ) ELSE (call :set_env )
 echo "Running" >> JenkinsTest.log
 date /T >> JenkinsTest.log
 time /T >> JenkinsTest.log
 
 REM Create Temporary Directory and copy files for testing.
-mkdir c:\GitJenkins\Temp
-copy C:\SCM\GitJenkins\Main.java C:\GitJenkins\Temp
+mkdir %sourcePath%
+copy %outputPath%\Main.java %sourcePath%
 
 REM Test compile .java file
-javac C:\GitJenkins\Temp\Main.java > C:\SCM\GitJenkins\compileOut.txt 2>&1
+javac %sourcePath%\Main.java > %outputPath%\compileOut.txt 2>&1
 
 REM Run Static Analysis using PMD on .java file
-REM C:\PMD\bin\pmd.bat -d C:\GitJenkins\Temp\Main.java -f text -R rulesets/java/quickstart.xml > C:\GitJenkins\Temp\PMDOut.txt 2>&1
-cmd /c "C:\PMD\bin\pmd.bat -d C:\GitJenkins\Temp\Main.java -f text -R rulesets/java/quickstart.xml -failOnViolation false" > C:\SCM\GitJenkins\staticOut.txt 2>&1
+REM C:\PMD\bin\pmd.bat -d %sourcePath%\Main.java -f text -R rulesets/java/quickstart.xml > %sourcePath%\PMDOut.txt 2>&1
+cmd /c "%pmdBin%\pmd.bat -d %sourcePath%\Main.java -f text -R rulesets/java/quickstart.xml -failOnViolation false" > %outputPath%\staticOut.txt 2>&1
 
 
 REM Set the login credentials
-"c:\Program Files\Collaborator Client 12201\ccollab.exe" login http://127.0.0.1:8080 melgage melgage
+%collabClient% login %host% %user% %password%
 
 REM Create a "New Review"
-"c:\Program Files\Collaborator Client 12201\ccollab.exe" --no-browser admin review create --creator melgage --title "Main.java Review" --template Default
+%collabClient% --no-browser admin review create --creator %user% --title "Main.java Review" --template Default
 
 REM Attach Code file changes
-"c:\Program Files\Collaborator Client 12201\ccollab.exe" --non-interactive addchanges last C:\SCM\GitJenkins\Main.java
+%collabClient% --non-interactive addchanges last %outputPath%\Main.java
 
 REM Attach an external compile report
-"c:\Program Files\Collaborator Client 12201\ccollab.exe" --non-interactive addchanges last C:\SCM\GitJenkins\compileOut.txt
+%collabClient% --non-interactive addchanges last %outputPath%\compileOut.txt
 REM Attach an external linting report
-"c:\Program Files\Collaborator Client 12201\ccollab.exe" --non-interactive addchanges last C:\SCM\GitJenkins\staticOut.txt
+%collabClient% --non-interactive addchanges last %outputPath%\staticOut.txt
 
-REM Clean up temporary files
-del /f /q /s C:\GitJenkins\Temp\*.* > NUL
-rmdir /q /s C:\GitJenkins\Temp
-rmdir /q /s C:\GitJenkins
 
+
+if [%1%]==[] ( call :cleanup )
 
 REM pause
 REM cmd /K
