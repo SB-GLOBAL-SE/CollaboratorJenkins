@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 REM echo "Task 1"
 REM tasklist
@@ -7,7 +7,7 @@ REM echo "**********************************************************************
 
 REM echo "Task 2"
 REM ipconfig
-REM echo "JenkinsBatTest.bat <CollabHost> <user> <password> <outPutPath> "
+echo "JenkinsBatTest.bat <CollabHost> <user> <password> <outPutPath> "
 
 
 SET sourcePath=
